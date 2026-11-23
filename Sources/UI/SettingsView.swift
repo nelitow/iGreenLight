@@ -91,6 +91,11 @@ struct SettingsView: View {
                     XboxToggleRow(id: "set-pacing", title: "Smooth frame pacing (adds a little latency)",
                                   detail: "Frames arrive from the network unevenly, which shows as judder in steady camera movement. This holds each frame for about half a frame (8 ms at 60 fps) and shows them at an even rhythm. The stats overlay shows the result under pacing.",
                                   isOn: $settings.framePacing)
+                    if FrameInterpolator.isSupported {
+                        XboxToggleRow(id: "set-framegen", title: "Frame generation (Apple ML, adds latency)",
+                                      detail: "Doubles the frame rate you see by inserting a frame made by Apple's low-latency frame interpolation model between every two game frames. Repeated frames in the stream (a 30 fps game arrives as 60 with each frame sent twice) are recognised and replaced. The real frame is held back until the generated one has been shown, so it adds about half a game frame plus the model's time: roughly 20-35 ms for a 30 fps game. Best for slower games; switch it off for shooters. The stats overlay shows the game's frame rate, the model's time and the added delay. Can be switched mid-stream from the stream menu.",
+                                      isOn: $settings.frameGeneration)
+                    }
                     XboxToggleRow(id: "set-drawonarrival", title: "Draw frames as they arrive",
                                   detail: "Draws each frame the moment it is decoded instead of waiting for the display's next refresh to pick it up, which saves up to one refresh of latency. Not used while smooth frame pacing is on.",
                                   isOn: $settings.drawOnArrival)

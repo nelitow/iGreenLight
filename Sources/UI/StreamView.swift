@@ -132,6 +132,7 @@ struct StreamView: View {
             .onChange(of: settings.ambientBars) { session.applySettings() }
             .onChange(of: settings.edrExpansion) { session.applySettings() }
             .onChange(of: settings.framePacing) { session.applySettings() }
+            .onChange(of: settings.frameGeneration) { session.applySettings() }
             .onChange(of: settings.drawOnArrival) { session.applySettings() }
             .onChange(of: settings.chromaUpsampling) { session.applySettings() }
             .onChange(of: settings.adaptiveSharpening) { session.applySettings() }
@@ -469,6 +470,9 @@ struct StreamMenu: View {
                         XboxToggleRow(id: "menu-ambient", title: "Ambient bars", isOn: $settings.ambientBars)
                         XboxChoiceRow(id: "menu-edr", title: "HDR highlight expansion", options: EDRExpansion.allCases, label: \.label, selection: $settings.edrExpansion)
                         XboxToggleRow(id: "menu-pacing", title: "Smooth frame pacing", isOn: $settings.framePacing)
+                        if FrameInterpolator.isSupported {
+                            XboxToggleRow(id: "menu-framegen", title: "Frame generation (Apple ML)", isOn: $settings.frameGeneration)
+                        }
                         XboxToggleRow(id: "menu-stats", title: "Stats overlay", isOn: $showStats)
                         if session.target.kind == .home {
                             XboxToggleRow(id: "menu-onconsole", title: "Controller is paired to the console", isOn: $settings.controllerOnConsole)

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		01ED3C1D024AD7E43A12F64F /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CBFCDB449DAFF13F94505BF /* Settings.swift */; };
 		09B62FE4EE457ED9AD159045 /* AWDLHold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BEECE0179C97B9477E8E7 /* AWDLHold.swift */; };
+		0AF7A1319AA138F1C01277B7 /* FrameInterpolatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43527BB3322292E97CC252D2 /* FrameInterpolatorTests.swift */; };
 		0B27974F346D0BA062E098B2 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD8E37C5B39C5C433B6BFE40 /* AuthManager.swift */; };
 		0E0D88A13FD685D869B4620A /* WebRTCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C1A5AC30532D33BB5E6A29 /* WebRTCClient.swift */; };
 		0F5DEE44862FA9A3C22807CB /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE5EFBE63239FAD05D90FA6 /* Keychain.swift */; };
@@ -21,6 +22,7 @@
 		1C9EAF868AEABDB095D4B64B /* Probe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A3D341B6D782C531DCC00F /* Probe.swift */; };
 		2067069C07D6763A8E22C090 /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D6F4C09D0355D56F86BE57 /* HTTP.swift */; };
 		20C381D9BD0BFF48BBA3265B /* DiagnosticsRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267A0434C75413B62CBE99A2 /* DiagnosticsRecorder.swift */; };
+		21DBC250DAB3F5E2F0FEC925 /* FrameInterpolator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F868E1949B954A0DA237FB0 /* FrameInterpolator.swift */; };
 		23B977834B1050B195B092E1 /* AWDLHoldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B2AE0999FB83D35D779420 /* AWDLHoldTests.swift */; };
 		253D8AD5ED485A78D4D116F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 219AC80D124501324B2F92C5 /* Assets.xcassets */; };
 		25C5EDDD9BA0E7DB510D4A15 /* XboxAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D589E1B64BAC9BE45676F849 /* XboxAuth.swift */; };
@@ -38,6 +40,7 @@
 		4AC0D28CE5C7EF89F9E79C8F /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2413377DE72D013CCFE402B /* SignInView.swift */; };
 		4B3AFEDE29FC281DF7851415 /* GamepadInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008870062782A81DC569DA20 /* GamepadInput.swift */; };
 		4C734469C3FD85B7F342896C /* StreamStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC7221FDCA4ED27A2C5E38F /* StreamStats.swift */; };
+		4E17B6A0A2CE7345ADFCF6CE /* FrameInterpolator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F868E1949B954A0DA237FB0 /* FrameInterpolator.swift */; };
 		4F5AF6857C5D29EA1452A9D9 /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8733452502A5EB9AF49C111 /* DeviceInfo.swift */; };
 		522D956C800C45B2E5A676CC /* TouchGamepad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1F36C2109FB0446DC70C15 /* TouchGamepad.swift */; };
 		5293D76E0D7441C380B6093B /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = D5C5BDBB005BF604292C2A7F /* WebRTC */; };
@@ -182,6 +185,7 @@
 		0D62FC51E17B72CEAB52ABCE /* MouseStick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseStick.swift; sourceTree = "<group>"; };
 		0DA47EE4442A811B6BEFDFAE /* Licenses */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Licenses; sourceTree = SOURCE_ROOT; };
 		0EC7221FDCA4ED27A2C5E38F /* StreamStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamStats.swift; sourceTree = "<group>"; };
+		0F868E1949B954A0DA237FB0 /* FrameInterpolator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameInterpolator.swift; sourceTree = "<group>"; };
 		156A2BB757B600C6ECD54185 /* FramePacingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FramePacingTests.swift; sourceTree = "<group>"; };
 		217AD6E1F003FE301269578C /* SessionAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionAPI.swift; sourceTree = "<group>"; };
 		219AC80D124501324B2F92C5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -194,6 +198,7 @@
 		38C286B96942B31CD2ACCB3A /* MouseStickTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseStickTests.swift; sourceTree = "<group>"; };
 		3A1F36C2109FB0446DC70C15 /* TouchGamepad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchGamepad.swift; sourceTree = "<group>"; };
 		3E084365B5E88D1AB466ABC1 /* iGreenLight.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iGreenLight.entitlements; sourceTree = "<group>"; };
+		43527BB3322292E97CC252D2 /* FrameInterpolatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameInterpolatorTests.swift; sourceTree = "<group>"; };
 		4623FD878F55005D8EBBD928 /* ICE.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICE.swift; sourceTree = "<group>"; };
 		47D8E635471BE7E33852FDCA /* ConsoleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListView.swift; sourceTree = "<group>"; };
 		49A59C212D7A4D2E09FCD603 /* ICEHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICEHelperTests.swift; sourceTree = "<group>"; };
@@ -291,6 +296,7 @@
 			children = (
 				49D02364EDE2954CB6EE84D6 /* APITests.swift */,
 				92B2AE0999FB83D35D779420 /* AWDLHoldTests.swift */,
+				43527BB3322292E97CC252D2 /* FrameInterpolatorTests.swift */,
 				156A2BB757B600C6ECD54185 /* FramePacingTests.swift */,
 				49A59C212D7A4D2E09FCD603 /* ICEHelperTests.swift */,
 				FA79ADA487431F4670765730 /* InputPacketTests.swift */,
@@ -330,6 +336,7 @@
 		64B09BA8106B41308125163F /* Render */ = {
 			isa = PBXGroup;
 			children = (
+				0F868E1949B954A0DA237FB0 /* FrameInterpolator.swift */,
 				03DCFF2EFCFB4CC7A7A2AA41 /* MetalVideoRenderer.swift */,
 				E89FE5D0B83E636AA370CA91 /* Shaders.metal */,
 				B47849DFBD9276F1F84E07C2 /* VTSuperResolution.swift */,
@@ -637,10 +644,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				65113F33F05CA01AC63E1F1D /* iGreenLight */,
 				D90DA6AC2E8F9D4C74A0CB3B /* awdl-helper */,
-				D11A33663EF35FA508077795 /* iGreenLightTests */,
+				65113F33F05CA01AC63E1F1D /* iGreenLight */,
 				BF23050937695072D9C40E22 /* iGreenLight-iOS */,
+				D11A33663EF35FA508077795 /* iGreenLightTests */,
 			);
 		};
 /* End PBXProject section */
@@ -674,6 +681,7 @@
 			files = (
 				627362AD7AD70E6D2D386E7D /* APITests.swift in Sources */,
 				23B977834B1050B195B092E1 /* AWDLHoldTests.swift in Sources */,
+				0AF7A1319AA138F1C01277B7 /* FrameInterpolatorTests.swift in Sources */,
 				5F05D32BC1017D0F28A4AC27 /* FramePacingTests.swift in Sources */,
 				3632B02D1FAF8B39744ECAA7 /* ICEHelperTests.swift in Sources */,
 				903285BCDF72FF53E76D33DB /* InputPacketTests.swift in Sources */,
@@ -703,6 +711,7 @@
 				20C381D9BD0BFF48BBA3265B /* DiagnosticsRecorder.swift in Sources */,
 				4879AADD4D889D5A4489795F /* FrameFeedback.swift in Sources */,
 				BCF8C13EDB5883635526B04E /* FrameInspector.swift in Sources */,
+				4E17B6A0A2CE7345ADFCF6CE /* FrameInterpolator.swift in Sources */,
 				3B9A34E48A2DF2006DB3B30C /* GameAudioDevice.swift in Sources */,
 				19FEA3EEFD6D6B01A6256652 /* GamePassAPI.swift in Sources */,
 				8892251757C086339A042611 /* GamepadInput.swift in Sources */,
@@ -767,6 +776,7 @@
 				A0034F2244BA03D0027DF896 /* DiagnosticsRecorder.swift in Sources */,
 				C8A99B864BFAA63D59AB50C1 /* FrameFeedback.swift in Sources */,
 				E8405891FCCCE7499BC18A76 /* FrameInspector.swift in Sources */,
+				21DBC250DAB3F5E2F0FEC925 /* FrameInterpolator.swift in Sources */,
 				D80D144A647ADFBFC3ED7FA1 /* GameAudioDevice.swift in Sources */,
 				BEA425C6CDD47B87816800E7 /* GamePassAPI.swift in Sources */,
 				4B3AFEDE29FC281DF7851415 /* GamepadInput.swift in Sources */,

@@ -144,6 +144,8 @@ final class AppSettings: ObservableObject {
     @AppStorage("framePacing") var framePacing = false
     /// Unpaced only: draw each frame when the decoder delivers it instead of at the next display tick.
     @AppStorage("drawOnArrival") var drawOnArrival = true
+    /// Insert a VideoToolbox ML-interpolated frame between game frames (`FrameInterpolator`), macOS 26+.
+    @AppStorage("frameGeneration") var frameGeneration = false
     @AppStorage("startFullscreen") var startFullscreen = true
     @AppStorage("locale") var locale = "en-US"
     @AppStorage("vibration") var vibration = true
@@ -189,7 +191,7 @@ final class AppSettings: ObservableObject {
         ["quality": quality.label, "osName": osName, "clientProfile": clientProfile.rawValue.isEmpty ? "auto" : clientProfile.rawValue,
          "sdkProfile": sdkProfile.rawValue, "codecPreference": codecPreference.rawValue, "codecOnlyPreferred": codecOnlyPreferred,
          "maxVideoBitrateKbps": maxVideoBitrateKbps, "requestedSize": "\(requestedSize.width)x\(requestedSize.height)",
-         "request1610": request1610, "reportedDisplaySize": reportedDisplaySize.rawValue, "upscaler": upscaler.rawValue, "deband": deband, "sharpness": sharpness, "ambientBars": ambientBars, "edrExpansion": edrExpansion.rawValue, "holdResolution": holdResolution, "framePacing": framePacing,
+         "request1610": request1610, "reportedDisplaySize": reportedDisplaySize.rawValue, "upscaler": upscaler.rawValue, "deband": deband, "sharpness": sharpness, "ambientBars": ambientBars, "edrExpansion": edrExpansion.rawValue, "holdResolution": holdResolution, "framePacing": framePacing, "frameGeneration": frameGeneration,
          "drawOnArrival": drawOnArrival, "chromaUpsampling": chromaUpsampling, "adaptiveSharpening": adaptiveSharpening,
          "protectFrameRate": protectFrameRate, "offerRTX": offerRTX, "lowLatencyPlayout": lowLatencyPlayout,
          "fastAudioCatchUp": fastAudioCatchUp, "frameTimingFeedback": frameTimingFeedback,
