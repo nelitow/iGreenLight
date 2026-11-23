@@ -42,6 +42,8 @@ final class StreamSession: ObservableObject {
     let renderer: MetalVideoRenderer?
     /// Between the video track and the renderer; passes frames through unless frame generation is on.
     let interpolator: FrameInterpolator?
+    /// In front of the interpolator: track → noise filter → interpolator → renderer.
+    let noiseFilter: NoiseFilter?
     private let rendererError: String?
     let keyboard = KeyboardInput()
     let mouse = MouseInput()
@@ -74,6 +76,7 @@ final class StreamSession: ObservableObject {
         let made = Result { try MetalVideoRenderer() }
         renderer = try? made.get()
         interpolator = renderer.map { FrameInterpolator(downstream: $0) }
+        noiseFilter = interpolator.map { NoiseFilter(downstream: $0) }
         if case .failure(let error) = made { rendererError = error.localizedDescription } else { rendererError = nil }
         applySettings()
         renderer?.onFrameSize = { [weak self] w, h in self?.decodedSize = (w, h) }
@@ -264,7 +267,7 @@ final class StreamSession: ObservableObject {
 
     // MARK: WebRTC wiring
     private func wire(_ rtc: WebRTCClient) {
-        let renderer = self.interpolator
+        let renderer = self.noiseFilter
         rtc.onVideoTrack = { [weak self] track in
             Task { @MainActor in
                 guard let self, !self.stopped, !self.attachedVideo else { return }
@@ -434,7 +437,7 @@ final class StreamSession: ObservableObject {
                 if let d = s.decodeMs { rtc.feedback.decodeMs = d }
                 s.sharpenNote = self.adaptSharpening(s)
                 s.frameRateNote = self.protectFrameRate()
-                s.upscale = (self.renderer?.upscaleStatus ?? "-") + (self.settings.frameGeneration ? " · frame gen " + (self.interpolator?.status ?? "-") : "")
+                s.upscale = (self.renderer?.upscaleStatus ?? "-") + (self.settings.noiseReduction != .off ? " · denoise " + (self.noiseFilter?.status ?? "-") : "") + (self.settings.frameGeneration ? " · frame gen " + (self.interpolator?.status ?? "-") : "")
                 s.serverSize = self.serverVideoSize.map { "\($0.0)x\($0.1)" }
                 self.stats = s
             }
@@ -529,6 +532,9 @@ final class StreamSession: ObservableObject {
         renderer?.drawOnArrival = settings.drawOnArrival
         renderer?.chromaUpsampling = settings.chromaUpsampling
         interpolator?.enabled = settings.frameGeneration
+        noiseFilter?.reduction = settings.noiseReduction
+        noiseFilter?.compare = settings.compareSplit
+        renderer?.compare = settings.compareSplit
         // Switched off: back to the plain setting now, and start from scratch if it is switched on again.
         if !settings.adaptiveSharpening {
             sharpen = SharpenGovernor()
@@ -611,7 +617,8 @@ final class StreamSession: ObservableObject {
         inputPump = nil
         keyboard.stop()
         mouse.stop()
-        if let t = videoTrack, let interpolator { t.remove(interpolator) }
+        if let t = videoTrack, let noiseFilter { t.remove(noiseFilter) }
+        noiseFilter?.reduction = .off
         interpolator?.enabled = false
         videoTrack = nil; audioTrack = nil
         if let rtc {

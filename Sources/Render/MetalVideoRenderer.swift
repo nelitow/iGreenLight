@@ -71,6 +71,7 @@ final class MetalVideoRenderer: NSObject, RTCVideoRenderer, MTKViewDelegate {
         var pictureAnchorY = 0.5
         var chromaUpsampling = true
         var drawOnArrival = true
+        var compare = false
         var effectiveUpscaler: Upscaler { upscaler.capped(by: maxUpscaler) }
     }
 
@@ -144,6 +145,8 @@ final class MetalVideoRenderer: NSObject, RTCVideoRenderer, MTKViewDelegate {
     /// Unpaced only: draw each frame as soon as the decoder delivers it instead of at the next display tick.
     /// Off is the old polling path, kept selectable so the two can be compared on the same stream.
     var drawOnArrival: Bool { get { read(\.drawOnArrival) } set { write(\.drawOnArrival, newValue) } }
+    /// Side by side: the left half of the picture without upscaling, sharpening or debanding, the right half as set.
+    var compare: Bool { get { read(\.compare) } set { write(\.compare, newValue) } }
     /// Release frames on an even cadence from a short queue instead of showing each at the first tick after it
     /// arrives (`FramePacer`; adds about half a stream frame of latency). Off: exactly the unpaced path.
     var framePacing: Bool {
@@ -545,6 +548,7 @@ final class MetalVideoRenderer: NSObject, RTCVideoRenderer, MTKViewDelegate {
             if config.deband { parts.append("deband" + (config.debandBoost > 1 ? String(format: " ×%.2f", min(config.debandBoost, 2)) : "")) }
             if wantAmbient { parts.append("ambient bars") }
             if edrDrawable && config.edr != .off { parts.append(String(format: "EDR ×%.1f (headroom %.1f)", peak, headroom)) }
+            if config.compare { parts.append("compare: left original") }
             label = parts.joined(separator: ", ")
             frameSeed = Float((frameCount &* 37) % 1024)
         }
@@ -571,6 +575,26 @@ final class MetalVideoRenderer: NSObject, RTCVideoRenderer, MTKViewDelegate {
         enc.setFragmentTexture(ambientSource ?? source, index: 1)
         enc.setFragmentBytes(&params, length: MemoryLayout<PresentParams>.stride, index: 0)
         enc.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+        if config.compare {
+            // Left of the picture's middle: the converted frame drawn plainly (bilinear, no sharpening or
+            // debanding), then a 2 px black divider.
+            let mid = Int(((dw - cw) / 2 + cw / 2).rounded())
+            if mid > 2 && mid < width - 2 {
+                var plain = params
+                plain.sharpen.x = 0
+                plain.deband.z = 0
+                enc.setScissorRect(MTLScissorRect(x: 0, y: 0, width: mid - 1, height: height))
+                enc.setFragmentTexture(rgb, index: 0)
+                enc.setFragmentBytes(&plain, length: MemoryLayout<PresentParams>.stride, index: 0)
+                enc.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+                var divider = params
+                divider.uv = SIMD4(0, 0, -10, -10)
+                divider.ambient.x = 0
+                enc.setScissorRect(MTLScissorRect(x: mid - 1, y: 0, width: 2, height: height))
+                enc.setFragmentBytes(&divider, length: MemoryLayout<PresentParams>.stride, index: 0)
+                enc.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+            }
+        }
         enc.endEncoding()
         if let item {
             // When this frame really reaches the glass, for the pacing numbers and whoever else wants to know.

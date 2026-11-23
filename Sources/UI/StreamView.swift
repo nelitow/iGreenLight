@@ -133,6 +133,8 @@ struct StreamView: View {
             .onChange(of: settings.edrExpansion) { session.applySettings() }
             .onChange(of: settings.framePacing) { session.applySettings() }
             .onChange(of: settings.frameGeneration) { session.applySettings() }
+            .onChange(of: settings.noiseReduction) { session.applySettings() }
+            .onChange(of: settings.compareSplit) { session.applySettings() }
             .onChange(of: settings.drawOnArrival) { session.applySettings() }
             .onChange(of: settings.chromaUpsampling) { session.applySettings() }
             .onChange(of: settings.adaptiveSharpening) { session.applySettings() }
@@ -473,6 +475,10 @@ struct StreamMenu: View {
                         if FrameInterpolator.isSupported {
                             XboxToggleRow(id: "menu-framegen", title: "Frame generation (Apple ML)", isOn: $settings.frameGeneration)
                         }
+                        if NoiseFilter.isSupported {
+                            XboxChoiceRow(id: "menu-denoise", title: "Noise reduction (Apple ML)", options: NoiseReduction.allCases, label: \.label, selection: $settings.noiseReduction)
+                        }
+                        XboxToggleRow(id: "menu-compare", title: "Compare: left half original", isOn: $settings.compareSplit)
                         XboxToggleRow(id: "menu-stats", title: "Stats overlay", isOn: $showStats)
                         if session.target.kind == .home {
                             XboxToggleRow(id: "menu-onconsole", title: "Controller is paired to the console", isOn: $settings.controllerOnConsole)

@@ -199,7 +199,7 @@ final class FrameInterpolator: NSObject, RTCVideoRenderer, @unchecked Sendable {
 
     /// Luma at a 160x90 grid, each a 2x2 average. Dense enough that a small object moving doesn't slip between
     /// samples and get its frame mistaken for a repeat.
-    private static func signature(_ pb: CVPixelBuffer) -> [UInt8] {
+    static func signature(_ pb: CVPixelBuffer) -> [UInt8] {
         CVPixelBufferLockBaseAddress(pb, .readOnly)
         defer { CVPixelBufferUnlockBaseAddress(pb, .readOnly) }
         guard let base = CVPixelBufferGetBaseAddressOfPlane(pb, 0) else { return [] }
@@ -217,7 +217,7 @@ final class FrameInterpolator: NSObject, RTCVideoRenderer, @unchecked Sendable {
         return out
     }
 
-    private static func same(_ a: [UInt8], _ b: [UInt8]) -> Bool {
+    static func same(_ a: [UInt8], _ b: [UInt8]) -> Bool {
         guard a.count == b.count, !a.isEmpty else { return false }
         var sum = 0, mx = 0
         for i in 0..<a.count {
