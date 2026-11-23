@@ -52,11 +52,15 @@ struct SettingsView: View {
                     XboxToggleRow(id: "set-hold", title: "Hold this resolution on Remote Play",
                                   detail: "The console drops to a lower resolution on its own; this asks for the Quality tier again after 5 seconds below it.",
                                   isOn: $settings.holdResolution)
+                    XboxVolumeRow(id: "set-volume", detail: "Game audio only, on top of the system volume. Also in the in-stream menu.", volume: $settings.volume)
                     HStack {
                         Text("Game language").font(.body.weight(.medium)).foregroundStyle(.white)
                         Spacer()
                         TextField("en-US", text: $settings.locale).textFieldStyle(.plain).multilineTextAlignment(.trailing)
-                            .foregroundStyle(Xbox.brightGreen).frame(maxWidth: 140).autocorrectionDisabled()
+                            .foregroundStyle(Xbox.brightGreen).font(.callout.weight(.semibold)).autocorrectionDisabled()
+                            .padding(.horizontal, 10).padding(.vertical, 5)
+                            .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+                            .frame(maxWidth: 140)
                     }
                     .padding(.horizontal, 14).frame(minHeight: 46)
                     .background(Xbox.surface, in: RoundedRectangle(cornerRadius: Xbox.corner))
@@ -91,6 +95,19 @@ struct SettingsView: View {
                     XboxToggleRow(id: "set-pacing", title: "Smooth frame pacing (adds a little latency)",
                                   detail: "Frames arrive from the network unevenly, which shows as judder in steady camera movement. This holds each frame for about half a frame (8 ms at 60 fps) and shows them at an even rhythm. The stats overlay shows the result under pacing.",
                                   isOn: $settings.framePacing)
+                    if FrameInterpolator.isSupported {
+                        XboxToggleRow(id: "set-framegen", title: "Frame generation (Apple ML, adds latency)",
+                                      detail: "Doubles the frame rate you see by inserting a frame made by Apple's low-latency frame interpolation model between every two game frames. Repeated frames in the stream (a 30 fps game arrives as 60 with each frame sent twice) are recognised and replaced. The real frame is held back until the generated one has been shown, so it adds about half a game frame plus the model's time: roughly 20-35 ms for a 30 fps game. Best for slower games; switch it off for shooters. The stats overlay shows the game's frame rate, the model's time and the added delay. Can be switched mid-stream from the stream menu.",
+                                      isOn: $settings.frameGeneration)
+                    }
+                    if NoiseFilter.isSupported {
+                        XboxChoiceRow(id: "set-denoise", title: "Noise reduction (Apple ML)",
+                                      detail: "Calms the shimmer, mosquito noise and blocking that video compression leaves, most visible in foliage, dark scenes and flat walls. Uses Apple's temporal noise filter with the previous frames as reference, so it adds no frame of delay, only the model's time (shown in the stats overlay). Stronger settings also soften fine texture; Light is the safe start. Experimental.",
+                                      options: NoiseReduction.allCases, label: \.label, selection: $settings.noiseReduction)
+                    }
+                    XboxToggleRow(id: "set-compare", title: "Compare: left half original",
+                                  detail: "Splits the picture down the middle: the left half without upscaling, sharpening, debanding or noise reduction, the right half with your settings, so their effect can be judged side by side. Frame generation is not part of the comparison. Also in the stream menu.",
+                                  isOn: $settings.compareSplit)
                     XboxToggleRow(id: "set-drawonarrival", title: "Draw frames as they arrive",
                                   detail: "Draws each frame the moment it is decoded instead of waiting for the display's next refresh to pick it up, which saves up to one refresh of latency. Not used while smooth frame pacing is on.",
                                   isOn: $settings.drawOnArrival)

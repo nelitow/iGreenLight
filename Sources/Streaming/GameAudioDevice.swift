@@ -23,6 +23,16 @@ final class GameAudioDevice: NSObject, RTCAudioDevice, @unchecked Sendable {
     fileprivate var playout: RTCAudioDeviceGetPlayoutDataBlock?
     private var playing = false
     private var observers: [NSObjectProtocol] = []
+    /// Playback gain, 0...1. Written on the main thread, read on the render thread; a stale read for one
+    /// buffer only delays a volume change by a few milliseconds.
+    nonisolated(unsafe) static var gain: Float = 1
+
+    /// Percent to gain on a squared curve, so the slider's middle sounds like half volume rather than barely
+    /// quieter than full.
+    static func setVolume(percent: Int) {
+        let v = Float(min(100, max(0, percent))) / 100
+        gain = v * v
+    }
 
     // MARK: RTCAudioDevice — parameters
     var deviceInputSampleRate: Double { Self.sampleRate }
@@ -183,7 +193,17 @@ private func gameAudioRender(_ refCon: UnsafeMutableRawPointer, _ flags: UnsafeM
                              _ data: UnsafeMutablePointer<AudioBufferList>?) -> OSStatus {
     guard let data else { return noErr }
     let device = Unmanaged<GameAudioDevice>.fromOpaque(refCon).takeUnretainedValue()
-    if let playout = device.playout, playout(flags, timestamp, Int(bus), frames, data) == noErr { return noErr }
+    if let playout = device.playout, playout(flags, timestamp, Int(bus), frames, data) == noErr {
+        let gain = GameAudioDevice.gain
+        if gain < 0.999 {
+            for buffer in UnsafeMutableAudioBufferListPointer(data) {
+                guard let p = buffer.mData?.assumingMemoryBound(to: Int16.self) else { continue }
+                let n = Int(buffer.mDataByteSize) / 2
+                for i in 0..<n { p[i] = Int16(Float(p[i]) * gain) }
+            }
+        }
+        return noErr
+    }
     for buffer in UnsafeMutableAudioBufferListPointer(data) {
         if let p = buffer.mData { memset(p, 0, Int(buffer.mDataByteSize)) }
     }

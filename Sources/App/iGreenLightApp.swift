@@ -29,6 +29,10 @@ struct iGreenLightApp: App {
             library.cloudTitles = (1...36).map { CloudTitle(id: "demo\($0)", productId: "P\($0)", name: "Demo Game \($0)", supportsMKB: $0 % 7 == 0) }
             library.recentTitles = Array(library.cloudTitles.prefix(6))
             _ = GamepadInput.shared
+            // `--ui-demo --settings`: open on the Settings tab.
+            if CommandLine.arguments.contains("--settings") {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { NotificationCenter.default.post(name: .showSettingsTab, object: nil) }
+            }
             return
         }
         #endif

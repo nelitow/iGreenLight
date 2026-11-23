@@ -171,19 +171,36 @@ struct XboxToggleRow: View {
 
     var body: some View {
         XboxRow(id: id, title: title, detail: detail, adjust: { d in if !disabled { isOn = d > 0 } }, action: { if !disabled { isOn.toggle() } }) {
-            HStack(spacing: 8) {
-                Text(isOn ? "On" : "Off").font(.callout).foregroundStyle(Xbox.secondaryText)
-                Capsule().fill(isOn ? Xbox.green : Color.white.opacity(0.2))
-                    .frame(width: 40, height: 22)
-                    .overlay(alignment: isOn ? .trailing : .leading) { Circle().fill(.white).padding(3) }
-                    .animation(.easeOut(duration: 0.12), value: isOn)
-            }
+            // A click on the switch or anywhere on the row flips it.
+            Toggle(title, isOn: $isOn)
+                .labelsHidden()
+                .toggleStyle(XboxSwitchStyle())
+                .disabled(disabled)
         }
         .opacity(disabled ? 0.45 : 1)
     }
 }
 
-/// Pick one of a list: A or a tap steps to the next value, left / right step either way.
+/// The system switch's shape, but green whenever it is on: the stock macOS switch turns grey in an inactive
+/// window, which on this dark theme makes on and off look alike.
+struct XboxSwitchStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Capsule()
+            .fill(configuration.isOn ? Xbox.green : Color.white.opacity(0.16))
+            .overlay(Capsule().strokeBorder(.white.opacity(configuration.isOn ? 0 : 0.12), lineWidth: 1))
+            .frame(width: 38, height: 22)
+            .overlay(alignment: configuration.isOn ? .trailing : .leading) {
+                Circle().fill(.white).padding(2).shadow(color: .black.opacity(0.3), radius: 1, y: 1)
+            }
+            .animation(.snappy(duration: 0.15), value: configuration.isOn)
+            .contentShape(Capsule())
+            .onTapGesture { configuration.isOn.toggle() }
+    }
+}
+
+/// Pick one of a list. With the pointer (or a tap) the row opens a menu of all the values, the current one
+/// checked, like a system pop-up button. With a controller A steps to the next value and left / right step
+/// either way, since a system menu can't be driven from the pad.
 struct XboxChoiceRow<T: Hashable>: View {
     let id: String
     let title: String
@@ -191,6 +208,7 @@ struct XboxChoiceRow<T: Hashable>: View {
     let options: [T]
     let label: (T) -> String
     @Binding var selection: T
+    @ObservedObject private var nav = PadNavigator.shared
 
     private func step(_ d: Int) {
         guard !options.isEmpty else { return }
@@ -199,15 +217,93 @@ struct XboxChoiceRow<T: Hashable>: View {
     }
 
     var body: some View {
-        XboxRow(id: id, title: title, detail: detail, adjust: step, action: { step(1) }) {
-            HStack(spacing: 6) {
-                Image(systemName: "chevron.left").font(.caption2.weight(.bold)).foregroundStyle(Xbox.secondaryText)
-                Text(label(selection)).font(.callout.weight(.semibold)).foregroundStyle(Xbox.brightGreen)
-                    .lineLimit(2).multilineTextAlignment(.trailing)
-                Image(systemName: "chevron.right").font(.caption2.weight(.bold)).foregroundStyle(Xbox.secondaryText)
+        let focused = nav.isFocused(id)
+        Menu {
+            Picker(title, selection: $selection) {
+                ForEach(options, id: \.self) { Text(label($0)).tag($0) }
             }
-            .frame(maxWidth: 230, alignment: .trailing)
+            .pickerStyle(.inline)
+            .labelsHidden()
+        } label: {
+            HStack(alignment: .center, spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title).font(.body.weight(.medium)).foregroundStyle(.white)
+                    if let detail { Text(detail).font(.caption).foregroundStyle(Xbox.secondaryText).fixedSize(horizontal: false, vertical: true) }
+                }
+                Spacer(minLength: 8)
+                HStack(spacing: 6) {
+                    Text(label(selection)).font(.callout.weight(.semibold)).foregroundStyle(Xbox.brightGreen)
+                        .lineLimit(2).multilineTextAlignment(.trailing)
+                    Image(systemName: "chevron.up.chevron.down").font(.caption2.weight(.bold)).foregroundStyle(Xbox.secondaryText)
+                }
+                .padding(.horizontal, 10).padding(.vertical, 5)
+                .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+                .frame(maxWidth: 260, alignment: .trailing)
+            }
+            .multilineTextAlignment(.leading)
+            .padding(.horizontal, 14).padding(.vertical, 11)
+            .frame(maxWidth: .infinity, minHeight: 46)
+            .background(focused ? Xbox.surfaceRaised : Xbox.surface, in: RoundedRectangle(cornerRadius: Xbox.corner))
+            .contentShape(Rectangle())
         }
+        .menuStyle(.button)
+        .buttonStyle(.plain)
+        .menuIndicator(.hidden)
+        .simultaneousGesture(TapGesture().onEnded { nav.pointerUsed() })
+        .xboxFocus(focused, corner: Xbox.corner, scale: 1.0)
+        .padFocusable(id, adjust: step, action: { step(1) })
+    }
+}
+
+/// Game audio volume: a slider with the pointer, left / right in steps of 10 with a controller, A mutes and
+/// unmutes.
+struct XboxVolumeRow: View {
+    let id: String
+    var title = "Volume"
+    var detail: String? = nil
+    @Binding var volume: Int
+    @State private var beforeMute = 100
+    @ObservedObject private var nav = PadNavigator.shared
+
+    private var icon: String {
+        switch volume {
+        case 0: "speaker.slash.fill"
+        case ..<34: "speaker.wave.1.fill"
+        case ..<67: "speaker.wave.2.fill"
+        default: "speaker.wave.3.fill"
+        }
+    }
+
+    private func toggleMute() {
+        if volume > 0 { beforeMute = volume; volume = 0 } else { volume = max(beforeMute, 10) }
+    }
+
+    var body: some View {
+        let focused = nav.isFocused(id)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title).font(.body.weight(.medium)).foregroundStyle(.white)
+                    if let detail { Text(detail).font(.caption).foregroundStyle(Xbox.secondaryText).fixedSize(horizontal: false, vertical: true) }
+                }
+                Spacer(minLength: 8)
+                Text("\(volume)%").font(.callout.weight(.semibold).monospacedDigit()).foregroundStyle(Xbox.brightGreen)
+            }
+            HStack(spacing: 10) {
+                Button { nav.pointerUsed(); toggleMute() } label: {
+                    Image(systemName: icon).frame(width: 22).foregroundStyle(volume == 0 ? Xbox.secondaryText : .white)
+                }
+                .buttonStyle(.plain)
+                Slider(value: Binding(get: { Double(volume) }, set: { volume = Int($0.rounded()) }), in: 0...100)
+                    .tint(Xbox.green)
+                    .controlSize(.small)
+            }
+        }
+        .padding(.horizontal, 14).padding(.vertical, 11)
+        .frame(maxWidth: .infinity, minHeight: 46)
+        .background(focused ? Xbox.surfaceRaised : Xbox.surface, in: RoundedRectangle(cornerRadius: Xbox.corner))
+        .xboxFocus(focused, corner: Xbox.corner, scale: 1.0)
+        .padFocusable(id, adjust: { d in volume = min(100, max(0, volume + d * 10)) }, action: toggleMute)
     }
 }
 
