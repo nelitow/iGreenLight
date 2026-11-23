@@ -535,6 +535,7 @@ final class StreamSession: ObservableObject {
         noiseFilter?.reduction = settings.noiseReduction
         noiseFilter?.compare = settings.compareSplit
         renderer?.compare = settings.compareSplit
+        GameAudioDevice.setVolume(percent: settings.volume)
         // Switched off: back to the plain setting now, and start from scratch if it is switched on again.
         if !settings.adaptiveSharpening {
             sharpen = SharpenGovernor()

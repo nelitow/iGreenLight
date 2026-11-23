@@ -135,6 +135,7 @@ struct StreamView: View {
             .onChange(of: settings.frameGeneration) { session.applySettings() }
             .onChange(of: settings.noiseReduction) { session.applySettings() }
             .onChange(of: settings.compareSplit) { session.applySettings() }
+            .onChange(of: settings.volume) { session.applySettings() }
             .onChange(of: settings.drawOnArrival) { session.applySettings() }
             .onChange(of: settings.chromaUpsampling) { session.applySettings() }
             .onChange(of: settings.adaptiveSharpening) { session.applySettings() }
@@ -463,6 +464,7 @@ struct StreamMenu: View {
                         if !passive {
                             XboxRow(id: "menu-guide", title: "Press the Xbox button", action: { isOpen = false; session.sendGuideButton() }) { Image(systemName: "xbox.logo").foregroundStyle(Xbox.secondaryText) }
                         }
+                        XboxVolumeRow(id: "menu-volume", volume: $settings.volume)
                         XboxChoiceRow(id: "menu-quality", title: session.target.kind == .home ? "Quality" : "Quality (next session)",
                                       options: StreamQuality.allCases, label: \.label, selection: $settings.quality)
                         XboxChoiceRow(id: "menu-scaling", title: "Scaling", options: ScalingMode.allCases, label: \.label, selection: $settings.scaling)

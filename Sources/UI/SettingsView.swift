@@ -52,6 +52,7 @@ struct SettingsView: View {
                     XboxToggleRow(id: "set-hold", title: "Hold this resolution on Remote Play",
                                   detail: "The console drops to a lower resolution on its own; this asks for the Quality tier again after 5 seconds below it.",
                                   isOn: $settings.holdResolution)
+                    XboxVolumeRow(id: "set-volume", detail: "Game audio only, on top of the system volume. Also in the in-stream menu.", volume: $settings.volume)
                     HStack {
                         Text("Game language").font(.body.weight(.medium)).foregroundStyle(.white)
                         Spacer()

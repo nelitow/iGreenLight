@@ -255,6 +255,58 @@ struct XboxChoiceRow<T: Hashable>: View {
     }
 }
 
+/// Game audio volume: a slider with the pointer, left / right in steps of 10 with a controller, A mutes and
+/// unmutes.
+struct XboxVolumeRow: View {
+    let id: String
+    var title = "Volume"
+    var detail: String? = nil
+    @Binding var volume: Int
+    @State private var beforeMute = 100
+    @ObservedObject private var nav = PadNavigator.shared
+
+    private var icon: String {
+        switch volume {
+        case 0: "speaker.slash.fill"
+        case ..<34: "speaker.wave.1.fill"
+        case ..<67: "speaker.wave.2.fill"
+        default: "speaker.wave.3.fill"
+        }
+    }
+
+    private func toggleMute() {
+        if volume > 0 { beforeMute = volume; volume = 0 } else { volume = max(beforeMute, 10) }
+    }
+
+    var body: some View {
+        let focused = nav.isFocused(id)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title).font(.body.weight(.medium)).foregroundStyle(.white)
+                    if let detail { Text(detail).font(.caption).foregroundStyle(Xbox.secondaryText).fixedSize(horizontal: false, vertical: true) }
+                }
+                Spacer(minLength: 8)
+                Text("\(volume)%").font(.callout.weight(.semibold).monospacedDigit()).foregroundStyle(Xbox.brightGreen)
+            }
+            HStack(spacing: 10) {
+                Button { nav.pointerUsed(); toggleMute() } label: {
+                    Image(systemName: icon).frame(width: 22).foregroundStyle(volume == 0 ? Xbox.secondaryText : .white)
+                }
+                .buttonStyle(.plain)
+                Slider(value: Binding(get: { Double(volume) }, set: { volume = Int($0.rounded()) }), in: 0...100)
+                    .tint(Xbox.green)
+                    .controlSize(.small)
+            }
+        }
+        .padding(.horizontal, 14).padding(.vertical, 11)
+        .frame(maxWidth: .infinity, minHeight: 46)
+        .background(focused ? Xbox.surfaceRaised : Xbox.surface, in: RoundedRectangle(cornerRadius: Xbox.corner))
+        .xboxFocus(focused, corner: Xbox.corner, scale: 1.0)
+        .padFocusable(id, adjust: { d in volume = min(100, max(0, volume + d * 10)) }, action: toggleMute)
+    }
+}
+
 struct XboxSection<Content: View>: View {
     let title: String
     @ViewBuilder var content: () -> Content

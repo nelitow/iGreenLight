@@ -150,6 +150,8 @@ final class AppSettings: ObservableObject {
     @AppStorage("noiseReduction") var noiseReduction: NoiseReduction = .off
     /// Left half of the picture unprocessed, for judging the image settings.
     @AppStorage("compareSplit") var compareSplit = false
+    /// Game audio volume in percent (applied in `GameAudioDevice`, independent of the system volume).
+    @AppStorage("volume") var volume = 100
     @AppStorage("startFullscreen") var startFullscreen = true
     @AppStorage("locale") var locale = "en-US"
     @AppStorage("vibration") var vibration = true
@@ -195,7 +197,7 @@ final class AppSettings: ObservableObject {
         ["quality": quality.label, "osName": osName, "clientProfile": clientProfile.rawValue.isEmpty ? "auto" : clientProfile.rawValue,
          "sdkProfile": sdkProfile.rawValue, "codecPreference": codecPreference.rawValue, "codecOnlyPreferred": codecOnlyPreferred,
          "maxVideoBitrateKbps": maxVideoBitrateKbps, "requestedSize": "\(requestedSize.width)x\(requestedSize.height)",
-         "request1610": request1610, "reportedDisplaySize": reportedDisplaySize.rawValue, "upscaler": upscaler.rawValue, "deband": deband, "sharpness": sharpness, "ambientBars": ambientBars, "edrExpansion": edrExpansion.rawValue, "holdResolution": holdResolution, "framePacing": framePacing, "frameGeneration": frameGeneration, "noiseReduction": noiseReduction.rawValue, "compareSplit": compareSplit,
+         "request1610": request1610, "reportedDisplaySize": reportedDisplaySize.rawValue, "upscaler": upscaler.rawValue, "deband": deband, "sharpness": sharpness, "ambientBars": ambientBars, "edrExpansion": edrExpansion.rawValue, "holdResolution": holdResolution, "framePacing": framePacing, "frameGeneration": frameGeneration, "noiseReduction": noiseReduction.rawValue, "compareSplit": compareSplit, "volume": volume,
          "drawOnArrival": drawOnArrival, "chromaUpsampling": chromaUpsampling, "adaptiveSharpening": adaptiveSharpening,
          "protectFrameRate": protectFrameRate, "offerRTX": offerRTX, "lowLatencyPlayout": lowLatencyPlayout,
          "fastAudioCatchUp": fastAudioCatchUp, "frameTimingFeedback": frameTimingFeedback,
